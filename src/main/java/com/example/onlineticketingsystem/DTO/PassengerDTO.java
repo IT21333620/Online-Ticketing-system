@@ -1,5 +1,6 @@
 package com.example.onlineticketingsystem.DTO;
 
+import com.example.onlineticketingsystem.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,4 +16,5 @@ public class PassengerDTO {
     private String password;
     private String userType;
     private int balance;
+    private Role role;
 }
