@@ -14,7 +14,6 @@ public class PassengerDTO {
     private String email;
     private String contactNo;
     private String password;
-    private String userType;
-    private int balance;
     private Role role;
+    private int balance;
 }

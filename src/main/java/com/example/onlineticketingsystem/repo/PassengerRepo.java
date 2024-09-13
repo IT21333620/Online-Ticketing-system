@@ -10,6 +10,9 @@ import java.util.Optional;
 
 
 public interface PassengerRepo extends JpaRepository<Passenger,Integer> {
+
+    Optional<Passenger> findByEmail(String email);
+
     @Query(value = "SELECT * FROM passenger WHERE userID = ?1",nativeQuery = true)
     Passenger getPassengerById (int userID);
 
