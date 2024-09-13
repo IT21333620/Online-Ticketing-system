@@ -14,13 +14,6 @@ public class PassengerController {
     @Autowired
     private PassengerService passengerService;
 
-    // Insert passenger
-    @PostMapping("/createPassenger")
-    public PassengerDTO savePassenger(@RequestBody PassengerDTO passengerDTO) {
-        passengerService.savePassenger(passengerDTO);
-        return passengerDTO; // Return a response indicating success
-    }
-
     // Show all fields of passenger
     @GetMapping("/passengerById/{userID}")
     public PassengerDTO getPassengerById(@PathVariable int userID) {
@@ -39,11 +32,5 @@ public class PassengerController {
         passengerService.updateBalanceByUserId(amount, userID);
         int updatedBalance = passengerService.getBalanceByUserId(userID);
         return ResponseEntity.ok(updatedBalance);
-    }
-
-    // Check passenger credentials
-    @GetMapping("/checkPassenger/{userID}/{password}")
-    public boolean existsByUserIdAndPassword(@PathVariable int userID, @PathVariable String password) {
-        return passengerService.existsByUserIdAndPassword(userID, password);
     }
 }
