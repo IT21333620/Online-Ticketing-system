@@ -4,6 +4,9 @@ import com.example.onlineticketingsystem.DTO.InspectDTO;
 import com.example.onlineticketingsystem.entity.Inspect;
 import com.example.onlineticketingsystem.service.InspectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,53 +22,93 @@ public class InspectController {
 
 
     @PostMapping("/createInspect")
-    public InspectDTO saveInspect (@RequestBody InspectDTO inspectDTO){
-        return inspectService.saveInspect(inspectDTO);
+    public ResponseEntity<?> saveInspect (@RequestBody InspectDTO inspectDTO, Authentication authentication){
+        if (authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("admin"))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access denied. You need to have admin role.");
+        }
+        InspectDTO inspect = inspectService.saveInspect(inspectDTO);
+        return ResponseEntity.ok(inspect);
     }
 
     @GetMapping("/getInspect")
-    public List<InspectDTO> getAllInspects(){
-        return inspectService.getAllInspects();
+    public ResponseEntity<?> getAllInspects(Authentication authentication){
+        if (authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("admin") || grantedAuthority.getAuthority().equals("ticket-inspector"))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access denied. You need to have admin Or ticket-inspector role.");
+        }
+        List<InspectDTO> inspects = inspectService.getAllInspects();
+        return ResponseEntity.ok(inspects);
     }
 
     @GetMapping("/byInspector/{id}")
-    public List<Inspect> getInspectsByInspectorId(@PathVariable int id) {
-        return inspectService.getInspectsByInspectorId(id);
+    public ResponseEntity<?> getInspectsByInspectorId(@PathVariable int id, Authentication authentication) {
+        if (authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ticket-inspector") || grantedAuthority.getAuthority().equals("admin"))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access denied. You need to have ticket-inspector Or admin role.");
+        }
+        List<Inspect> inspects = inspectService.getInspectsByInspectorId(id);
+        return ResponseEntity.ok(inspects);
     }
 
     @DeleteMapping("/deleteInspect")
-    public boolean delete(@RequestBody InspectDTO inspectDTO) {
-        return inspectService.delete(inspectDTO);
+    public ResponseEntity<?> delete(@RequestBody InspectDTO inspectDTO, Authentication authentication) {
+        if (authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("admin"))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access denied. You need to have admin role.");
+        }
+        Boolean isDeleted = inspectService.delete(inspectDTO);
+        return ResponseEntity.ok(isDeleted);
     }
 
     @PutMapping("/updateInspect")
-    public InspectDTO updateInspect(@RequestBody InspectDTO inspectDTO){
-        return inspectService.updateInspect(inspectDTO);
+    public ResponseEntity<?> updateInspect(@RequestBody InspectDTO inspectDTO, Authentication authentication){
+        if (authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("admin"))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access denied. You need to have admin role.");
+        }
+        InspectDTO inspect = inspectService.updateInspect(inspectDTO);
+        return ResponseEntity.ok(inspect);
     }
 
     @GetMapping("/fraudCount")
-    public int fraudCount(){
-        return inspectService.fraudCount();
+    public ResponseEntity<?> fraudCount(Authentication authentication){
+        if (authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("admin") || grantedAuthority.getAuthority().equals("ticket-inspector"))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access denied. You need to have admin Or ticket-inspector role.");
+        }
+        int fraudCount = inspectService.fraudCount();
+        return ResponseEntity.ok(fraudCount);
     }
 
     @GetMapping("/fraudByRoute")
-    public Map<Integer, Integer> fraudByRoute(){
-        return inspectService.fraudByRoute();
+    public ResponseEntity<?> fraudByRoute(Authentication authentication){
+        if (authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("admin") || grantedAuthority.getAuthority().equals("ticket-inspector"))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access denied. You need to have admin Or ticket-inspector role.");
+        }
+        Map<Integer, Integer> fraudByRoute = inspectService.fraudByRoute();
+        return ResponseEntity.ok(fraudByRoute);
     }
 
     @GetMapping("/countTodayInspectors")
-    public Map<Integer, Long>getCountOfInspectorIdByRouteToday(){
-        return inspectService.getCountOfInspectorIdByRouteToday();
+    public ResponseEntity<?> getCountOfInspectorIdByRouteToday(Authentication authentication) {
+        if (authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("admin"))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access denied. You need to have admin role.");
+        }
+        Map<Integer, Long> countOfInspectorIdByRouteToday = inspectService.getCountOfInspectorIdByRouteToday();
+        return ResponseEntity.ok(countOfInspectorIdByRouteToday);
     }
 
     @GetMapping("/getInspectorHistory/{id}")
-    public List<Inspect> getInspectHistoryByInspectorId(@PathVariable int id) {
-        return inspectService.getInspectHistoryByInspectorId(id);
+    public ResponseEntity<?> getInspectHistoryByInspectorId(@PathVariable int id, Authentication authentication) {
+        if (authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ticket-inspector") || grantedAuthority.getAuthority().equals("admin"))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access denied. You need to have ticket-inspector Or admin role.");
+        }
+        List<Inspect> inspects = inspectService.getInspectHistoryByInspectorId(id);
+        return ResponseEntity.ok(inspects);
     }
 
     @GetMapping("/getInspectorUpComing/{id}")
-    public List<Inspect> getUpComingInspectByInspectorId(@PathVariable int id) {
-        return inspectService.getUpcomingInspectByInspectorId(id);
+    public ResponseEntity<?> getUpComingInspectByInspectorId(@PathVariable int id, Authentication authentication) {
+        if (authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("admin"))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access denied. You need to have admin role.");
+        }
+        List<Inspect> inspects = inspectService.getUpcomingInspectByInspectorId(id);
+        return ResponseEntity.ok(inspects);
     }
 
 
