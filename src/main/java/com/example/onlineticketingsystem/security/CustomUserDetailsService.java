@@ -1,10 +1,7 @@
 package com.example.onlineticketingsystem.security;
 
 import com.example.onlineticketingsystem.entity.*;
-import com.example.onlineticketingsystem.repo.BusOwnerRepo;
-import com.example.onlineticketingsystem.repo.PassengerRepo;
-import com.example.onlineticketingsystem.repo.TicketInspectorRepo;
-import com.example.onlineticketingsystem.repo.UserRepo;
+import com.example.onlineticketingsystem.repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,6 +26,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private BusOwnerRepo busOwnerRepo;
+
+    @Autowired
+    private AdminRepo adminRepo;
 
 
     @Override
@@ -58,6 +58,15 @@ public class CustomUserDetailsService implements UserDetailsService {
                     ticketInspector.getEmail(),
                     ticketInspector.getPassword(),
                     getAuthorities(ticketInspector.getRole())
+            );
+        }
+
+        Admin admin = adminRepo.findByEmail(email).orElse(null);
+        if (admin != null) {
+            return new org.springframework.security.core.userdetails.User(
+                    admin.getEmail(),
+                    admin.getPassword(),
+                    getAuthorities(admin.getRole())
             );
         }
 

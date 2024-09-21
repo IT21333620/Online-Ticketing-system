@@ -3,14 +3,8 @@ package com.example.onlineticketingsystem.service;
 import com.example.onlineticketingsystem.DTO.AuthResponseDTO;
 import com.example.onlineticketingsystem.DTO.LoginDTO;
 import com.example.onlineticketingsystem.DTO.RegisterDTO;
-import com.example.onlineticketingsystem.entity.BusOwner;
-import com.example.onlineticketingsystem.entity.Passenger;
-import com.example.onlineticketingsystem.entity.Role;
-import com.example.onlineticketingsystem.entity.TicketInspector;
-import com.example.onlineticketingsystem.repo.BusOwnerRepo;
-import com.example.onlineticketingsystem.repo.PassengerRepo;
-import com.example.onlineticketingsystem.repo.RoleRepo;
-import com.example.onlineticketingsystem.repo.TicketInspectorRepo;
+import com.example.onlineticketingsystem.entity.*;
+import com.example.onlineticketingsystem.repo.*;
 import com.example.onlineticketingsystem.security.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,18 +24,20 @@ public class AuthService {
     private PassengerRepo passengerRepo;
     private TicketInspectorRepo ticketInspectorRepo;
     private BusOwnerRepo busOwnerRepo;
+    private AdminRepo adminRepo;
     private RoleRepo roleRepo;
     private PasswordEncoder passwordEncoder;
     private JWTGenerator jwtGenerator;
 
     @Autowired
     public AuthService(AuthenticationManager authenticationManager, PassengerRepo passengerRepo,
-                       TicketInspectorRepo ticketInspectorRepo, BusOwnerRepo busOwnerRepo,
+                       TicketInspectorRepo ticketInspectorRepo, BusOwnerRepo busOwnerRepo, AdminRepo adminRepo,
                        RoleRepo roleRepo, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator) {
         this.authenticationManager = authenticationManager;
         this.passengerRepo = passengerRepo;
         this.ticketInspectorRepo = ticketInspectorRepo;
         this.busOwnerRepo = busOwnerRepo;
+        this.adminRepo = adminRepo;
         this.roleRepo = roleRepo;
         this.passwordEncoder = passwordEncoder;
         this.jwtGenerator = jwtGenerator;
@@ -94,6 +90,16 @@ public class AuthService {
                 ticketInspector.setRole(userRole.get());
                 ticketInspector.setInspectorID(registerDTO.getInspectorId());
                 ticketInspectorRepo.save(ticketInspector);
+                break;
+
+            case "A":
+                Admin admin = new Admin();
+                admin.setEmail(email);
+                admin.setPassword(password);
+                admin.setName(name);
+                admin.setContactNo(contactNo);
+                admin.setRole(userRole.get());
+                adminRepo.save(admin);
                 break;
 
             default:

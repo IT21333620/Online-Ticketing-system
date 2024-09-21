@@ -11,6 +11,7 @@ import java.util.List;
 @RequestMapping(value = "api/v1/bus")
 @CrossOrigin
 public class BusController {
+
     @Autowired
     private BusService busService;
 
