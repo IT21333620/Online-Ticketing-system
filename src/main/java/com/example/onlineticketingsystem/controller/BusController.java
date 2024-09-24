@@ -18,6 +18,11 @@ public class BusController {
     @Autowired
     private BusService busService;
 
+//    @GetMapping
+//    public ResponseEntity<?> helloBus(){
+//        return ResponseEntity.ok("Hello Bus");
+//    }
+
     @GetMapping("/getBus")
     public ResponseEntity<?> getBus(Authentication authentication){
         if (authentication.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("admin") )){
