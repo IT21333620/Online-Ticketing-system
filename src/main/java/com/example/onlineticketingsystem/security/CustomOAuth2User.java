@@ -37,6 +37,6 @@ public class CustomOAuth2User implements OAuth2User {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // You can return roles or authorities based on the user's details.
         // For example, returning a default "ROLE_USER":
-        return Collections.singletonList(new SimpleGrantedAuthority("passenger"));
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 }

@@ -12,50 +12,55 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.springframework.security.config.Customizer.*;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private CustomUserDetailsService userDetailsService;
-    private JwtAuthEntryPoint authEntryPoint;
+    private final CustomUserDetailsService userDetailsService;
+    private final JwtAuthEntryPoint authEntryPoint;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
-    public static final String API_AUTH_PATH = "/api/auth/**";
-    public static final String OAUTH2_PATH = "/oauth2/**";
-    public static final String LOGIN_PATH = "/login/**";
-
+    private static final String[] AUTH_WHITELIST = {
+            "/api/auth/**", "/login/**", "/oauth2/**", "/login/oauth/**",
+            "/login/oauth2/**", "/success/**", "/login/oauth2/code/**"
+    };
     @Autowired
     public SecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthEntryPoint jwtAuthEntryPoint,
-                          OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler) {
+                          OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
+                          CustomOAuth2UserService customOAuth2UserService) {
         this.userDetailsService = userDetailsService;
         this.authEntryPoint = jwtAuthEntryPoint;
         this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
+        this.customOAuth2UserService = customOAuth2UserService;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(e -> e.authenticationEntryPoint(authEntryPoint))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers(API_AUTH_PATH, OAUTH2_PATH, LOGIN_PATH).permitAll()
+                        .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(new CustomOAuth2UserService()))  // Define custom OAuth2 user service
-                        .successHandler(oAuth2AuthenticationSuccessHandler))
-                .httpBasic(httpBasic -> {});
+                                .userService(customOAuth2UserService))  // Inject the CustomOAuth2UserService
+                        .successHandler(oAuth2AuthenticationSuccessHandler))  // Handle success with custom handler
+                .httpBasic(Customizer.withDefaults());
 
+        // Place JWTAuthenticationFilter before OAuth2LoginAuthenticationFilter
+        http.addFilterBefore(jwtAuthenticationFilter(), OAuth2LoginAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -64,7 +69,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
