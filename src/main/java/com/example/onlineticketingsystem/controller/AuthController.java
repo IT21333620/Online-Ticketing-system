@@ -24,6 +24,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterDTO registerDTO) {
         try {
+            // Sanitize input here if needed, or do it in the service
             authService.registerUser(registerDTO);
             return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
         } catch (RuntimeException e) {

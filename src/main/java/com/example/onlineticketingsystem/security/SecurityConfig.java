@@ -42,7 +42,17 @@ public class SecurityConfig {
                 .oauth2Login(withDefaults())
                 .formLogin(withDefaults())
                 .httpBasic(httpBasic -> {});
-
+        http
+                .headers()
+                .contentSecurityPolicy("default-src 'self'");
+        http
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                .sessionFixation().migrateSession()
+                .and()
+                .rememberMe().key("uniqueAndSecret")
+                .and()
+                .csrf().disable();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
