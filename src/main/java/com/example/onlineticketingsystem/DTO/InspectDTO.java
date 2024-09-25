@@ -23,7 +23,7 @@ public class InspectDTO {
 
 
     public void setInspectId(int inspectId) {
-        inspectId = inspectId;
+        this.inspectId = inspectId;
     }
 
     public void setInspectorId(int inspectorId) {
