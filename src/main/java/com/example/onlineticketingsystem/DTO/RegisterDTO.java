@@ -3,19 +3,25 @@ package com.example.onlineticketingsystem.DTO;
 import com.example.onlineticketingsystem.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = false)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TicketInspectorDTO extends UserDTO{
-    private int userID;
+public class RegisterDTO {
+
     private String name;
     private String email;
     private String contactNo;
-//    private String password;
+    private String password;
     private Role role;
-    private int inspectorId;
+
+    private int balance; // for passenger
+
+    private int inspectorId; // for ticket inspector
+
+    private int registrationNo; // for bus owner
+    private String ownedBuses; // for bus owner
+
+    private String type; // for all
 }
